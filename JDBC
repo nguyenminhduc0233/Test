@@ -19,26 +19,6 @@ public class SQLServerConnection {
         return conn;
     }
 
-    // Hàm thực thi câu truy vấn SELECT và trả về kết quả
-    public static ResultSet executeSelectQuery(String query) {
-        try (Connection conn = connect(); Statement stmt = conn.createStatement()) {
-            return stmt.executeQuery(query);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    // Hàm thực thi câu truy vấn UPDATE, INSERT, DELETE
-    public static int executeUpdateQuery(String query) {
-        try (Connection conn = connect(); Statement stmt = conn.createStatement()) {
-            return stmt.executeUpdate(query);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return -1;
-    }
-
     // Hàm đóng kết nối
     public static void closeConnection(Connection conn) {
         try {
@@ -51,21 +31,36 @@ public class SQLServerConnection {
         }
     }
 
-    // Main để kiểm tra kết nối và thực thi các câu truy vấn
+    // Main để kiểm tra kết nối và thực thi PreparedStatement
     public static void main(String[] args) {
-        // Ví dụ sử dụng hàm thực thi SELECT
-        String selectQuery = "SELECT * FROM YourTable";
-        try (ResultSet rs = executeSelectQuery(selectQuery)) {
-            while (rs != null && rs.next()) {
-                System.out.println("Dữ liệu: " + rs.getString("column_name"));
+        // Kết nối tới cơ sở dữ liệu
+        try (Connection conn = connect()) {
+            // Ví dụ thực hiện câu truy vấn SELECT với PreparedStatement
+            String selectQuery = "SELECT * FROM YourTable WHERE column_name = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(selectQuery)) {
+                pstmt.setString(1, "some_value");  // Set giá trị vào dấu ? trong câu lệnh SQL
+                ResultSet rs = pstmt.executeQuery();
+
+                while (rs.next()) {
+                    // In kết quả trả về
+                    System.out.println("Dữ liệu: " + rs.getString("column_name"));
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            // Ví dụ thực hiện câu truy vấn UPDATE với PreparedStatement
+            String updateQuery = "UPDATE YourTable SET column_name = ? WHERE condition_column = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(updateQuery)) {
+                pstmt.setString(1, "new_value");  // Set giá trị mới cho cột
+                pstmt.setString(2, "condition_value");  // Set điều kiện để cập nhật
+                int rowsAffected = pstmt.executeUpdate();
+                System.out.println("Số hàng bị ảnh hưởng: " + rowsAffected);
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        // Ví dụ sử dụng hàm thực thi UPDATE/INSERT/DELETE
-        String updateQuery = "UPDATE YourTable SET column_name = 'new_value' WHERE condition";
-        int rowsAffected = executeUpdateQuery(updateQuery);
-        System.out.println("Số hàng bị ảnh hưởng: " + rowsAffected);
     }
 }
