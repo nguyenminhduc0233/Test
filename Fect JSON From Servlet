@@ -1,0 +1,57 @@
+// Servlet
+protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // Dữ liệu giả định cần trả về
+        String username = "JohnDoe"; // Tên người dùng
+        int age = 30;               // Tuổi người dùng
+
+        // Thiết lập loại nội dung trả về là JSON và mã hóa UTF-8
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        // Chuẩn bị chuỗi JSON để trả về
+        String jsonResponse = String.format("{\"username\":\"%s\", \"age\":%d}", username, age);
+
+        // Ghi dữ liệu JSON vào response
+        response.getWriter().write(jsonResponse);
+    }
+
+
+
+
+// Javascript
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fetch JSON Example</title>
+    <script>
+        // Hàm gọi Fetch API để lấy dữ liệu từ Servlet
+        async function fetchData() {
+            try {
+                // Gửi request GET đến Servlet
+                const response = await fetch("GetUserData");
+                if (!response.ok) { // Kiểm tra lỗi HTTP
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                // Chuyển đổi dữ liệu JSON trả về thành object
+                const data = await response.json();
+                console.log("Dữ liệu từ Servlet:", data);
+
+                // Hiển thị dữ liệu trên giao diện
+                document.getElementById("output").textContent = 
+                    `Username: ${data.username}, Age: ${data.age}`;
+            } catch (error) {
+                // Xử lý lỗi
+                console.error("Error fetching data:", error);
+            }
+        }
+
+        // Gọi hàm fetchData khi trang tải xong
+        window.onload = fetchData;
+    </script>
+</head>
+<body>
+    <h1>Fetch JSON Example</h1>
+    <div id="output">Loading data...</div>
+</body>
+</html>
