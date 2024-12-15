@@ -1,0 +1,131 @@
+import com.google.gson.Gson;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.*;
+import java.util.*;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/PaginationServlet")
+public class PaginationServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        int page = Integer.parseInt(request.getParameter("page"));
+        int limit = 5; // Số bản ghi mỗi trang
+        int offset = (page - 1) * limit;
+
+        List<Map<String, Object>> data = new ArrayList<>();
+        int totalRecords = 0;
+
+        try {
+            // Kết nối cơ sở dữ liệu
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/your_database", "username", "password");
+
+            // Lấy dữ liệu phân trang
+            String query = "SELECT * FROM table_name LIMIT ? OFFSET ?";
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.setInt(1, limit);
+            ps.setInt(2, offset);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Map<String, Object> row = new HashMap<>();
+                row.put("id", rs.getInt("id"));
+                row.put("name", rs.getString("name"));
+                data.add(row);
+            }
+
+            // Tính tổng số bản ghi
+            String countQuery = "SELECT COUNT(*) AS total FROM table_name";
+            ResultSet countRs = conn.createStatement().executeQuery(countQuery);
+            if (countRs.next()) {
+                totalRecords = countRs.getInt("total");
+            }
+
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Chuẩn bị JSON trả về
+        Map<String, Object> jsonResponse = new HashMap<>();
+        jsonResponse.put("data", data);
+        jsonResponse.put("total_pages", (int) Math.ceil((double) totalRecords / limit));
+        jsonResponse.put("current_page", page);
+
+        PrintWriter out = response.getWriter();
+        out.print(new Gson().toJson(jsonResponse)); // Sử dụng thư viện Gson để convert sang JSON
+        out.flush();
+    }
+}
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagination with AJAX</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div id="data-container">
+        <!-- Dữ liệu sẽ được hiển thị ở đây -->
+    </div>
+    <div id="pagination">
+        <!-- Các nút phân trang sẽ xuất hiện ở đây -->
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Hàm tải dữ liệu
+            function loadPage(page) {
+                $.ajax({
+                    url: "PaginationServlet", // Đường dẫn đến servlet
+                    method: "GET",
+                    data: { page: page }, // Gửi số trang qua GET
+                    dataType: "json",
+                    success: function (response) {
+                        // Hiển thị dữ liệu
+                        let html = '';
+                        response.data.forEach(function (item) {
+                            html += `<p>ID: ${item.id} - Name: ${item.name}</p>`;
+                        });
+                        $('#data-container').html(html);
+
+                        // Hiển thị phân trang
+                        let paginationHtml = '';
+                        for (let i = 1; i <= response.total_pages; i++) {
+                            paginationHtml += `<button class="page-btn" data-page="${i}">${i}</button>`;
+                        }
+                        $('#pagination').html(paginationHtml);
+                    },
+                    error: function () {
+                        alert('Lỗi khi tải dữ liệu.');
+                    }
+                });
+            }
+
+            // Gọi hàm loadPage lần đầu tiên
+            loadPage(1);
+
+            // Lắng nghe sự kiện click vào nút phân trang
+            $(document).on('click', '.page-btn', function () {
+                let page = $(this).data('page');
+                loadPage(page);
+            });
+        });
+    </script>
+</body>
+</html>
