@@ -1,57 +1,139 @@
 // Servlet
-protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // Dữ liệu giả định cần trả về
-        String username = "JohnDoe"; // Tên người dùng
-        int age = 30;               // Tuổi người dùng
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletResponse;
 
-        // Thiết lập loại nội dung trả về là JSON và mã hóa UTF-8
-        response.setContentType("application/json");
+@WebServlet("/GetNumberServlet")
+public class GetNumberServlet extends HttpServlet {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/plain"); // Trả về dạng text
         response.setCharacterEncoding("UTF-8");
 
-        // Chuẩn bị chuỗi JSON để trả về
-        String jsonResponse = String.format("{\"username\":\"%s\", \"age\":%d}", username, age);
+        int number = 123; // Số nguyên cần gửi
+        response.getWriter().write(String.valueOf(number)); // Gửi số nguyên
 
-        // Ghi dữ liệu JSON vào response
-        response.getWriter().write(jsonResponse);
+        String message = "Hello, this is a string from Servlet!";
+        response.getWriter().write(message); // Gửi chuỗi về phía client
+
+        
     }
+}
+
 
 
 
 
 // Javascript
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Fetch JSON Example</title>
-    <script>
-        // Hàm gọi Fetch API để lấy dữ liệu từ Servlet
-        async function fetchData() {
-            try {
-                // Gửi request GET đến Servlet
-                const response = await fetch("GetUserData");
-                if (!response.ok) { // Kiểm tra lỗi HTTP
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-
-                // Chuyển đổi dữ liệu JSON trả về thành object
-                const data = await response.json();
-                console.log("Dữ liệu từ Servlet:", data);
-
-                // Hiển thị dữ liệu trên giao diện
-                document.getElementById("output").textContent = 
-                    `Username: ${data.username}, Age: ${data.age}`;
-            } catch (error) {
-                // Xử lý lỗi
-                console.error("Error fetching data:", error);
-            }
-        }
-
-        // Gọi hàm fetchData khi trang tải xong
-        window.onload = fetchData;
-    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AJAX Console Log</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-    <h1>Fetch JSON Example</h1>
-    <div id="output">Loading data...</div>
+    <h1>AJAX Console Log Example</h1>
+    <button id="fetchNumber">Fetch Number</button>
+
+    <script>
+        $(document).ready(function () {
+            $("#fetchNumber").click(function () {
+                $.ajax({
+                    url: "GetNumberServlet", // URL đến Servlet
+                    type: "GET",            // Loại request (GET/POST)
+                    dataType: "text",       // Dữ liệu trả về là plain text
+                    success: function (response) {
+                        // Chuyển đổi chuỗi response thành số nguyên
+                        let number = parseInt(response, 10);
+                        // Log số nguyên ra console
+                        console.log("Received Number:", number);
+
+                        console.log("Received String:", response);
+                    },
+                    error: function (xhr, status, error) {
+                        // Xử lý lỗi nếu có
+                        console.error("Error fetching number:", error);
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
+
+
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/GetMixedDataServlet")
+public class GetMixedDataServlet extends HttpServlet {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        // Tạo chuỗi và danh sách
+        String message = "Hello from Servlet!";
+        List<String> list = new ArrayList<>();
+        list.add("Item 1");
+        list.add("Item 2");
+        list.add("Item 3");
+
+        // Chuyển dữ liệu thành JSON thủ công
+        StringBuilder json = new StringBuilder("{");
+        json.append("\"message\": \"").append(message).append("\",");
+        json.append("\"list\": [");
+        for (int i = 0; i < list.size(); i++) {
+            json.append("\"").append(list.get(i)).append("\"");
+            if (i < list.size() - 1) {
+                json.append(",");
+            }
+        }
+        json.append("]}");
+
+        response.getWriter().write(json.toString());
+    }
+}
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AJAX Mixed Data Example</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <button id="fetchData">Fetch Data</button>
+
+    <script>
+        $(document).ready(function () {
+            $("#fetchData").click(function () {
+                $.ajax({
+                    url: "GetMixedDataServlet", // URL đến servlet
+                    type: "GET",
+                    dataType: "json", // Dữ liệu trả về là JSON
+                    success: function (response) {
+                        console.log("Received Message:", response.message);
+                        console.log("Received List:", response.list);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching data:", error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
