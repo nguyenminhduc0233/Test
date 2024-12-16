@@ -1,0 +1,24 @@
+function validateDate(dateString) {
+    // Kiểm tra định dạng YYYY/MM/DD
+    const regex = /^\d{4}\/(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])$/;
+
+    if (!regex.test(dateString)) {
+        return false; // Sai định dạng
+    }
+
+    // Chuyển thành đối tượng Date
+    const [year, month, day] = dateString.split("/").map(Number);
+
+    const date = new Date(year, month - 1, day);
+
+    // Kiểm tra tính hợp lệ của ngày
+    return date.getFullYear() === year &&
+           date.getMonth() === month - 1 &&
+           date.getDate() === day;
+}
+
+// Kiểm tra
+console.log(validateDate("2024/12/16")); // true
+console.log(validateDate("2024/02/30")); // false (ngày không hợp lệ)
+console.log(validateDate("2024/13/01")); // false (tháng không hợp lệ)
+console.log(validateDate("abcd/ef/gh")); // false (sai định dạng)
