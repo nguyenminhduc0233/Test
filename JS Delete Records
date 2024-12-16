@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Multiple Records</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Delete Multiple Records</h1>
+    <table border="1" id="recordTable">
+        <thead>
+            <tr>
+                <th>Select</th>
+                <th>ID</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="checkbox" class="recordCheckbox" value="1"></td>
+                <td>1</td>
+                <td>Record One</td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="recordCheckbox" value="2"></td>
+                <td>2</td>
+                <td>Record Two</td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="recordCheckbox" value="3"></td>
+                <td>3</td>
+                <td>Record Three</td>
+            </tr>
+        </tbody>
+    </table>
+    <button id="deleteRecords">Delete Selected</button>
+
+    <script>
+        $(document).ready(function () {
+            $("#deleteRecords").click(function () {
+                // Thu thập danh sách các ID được chọn
+                let selectedIds = [];
+                $(".recordCheckbox:checked").each(function () {
+                    selectedIds.push($(this).val());
+                });
+
+                // Kiểm tra nếu không có record nào được chọn
+                if (selectedIds.length === 0) {
+                    alert("Please select at least one record to delete.");
+                    return;
+                }
+
+                // Gửi AJAX request để xóa
+                $.ajax({
+                    url: "DeleteRecordsServlet", // URL đến Servlet
+                    type: "POST",
+                    contentType: "application/json", // Gửi dữ liệu dưới dạng JSON
+                    data: JSON.stringify(selectedIds), // Chuyển danh sách thành JSON
+                    success: function (response) {
+                        alert(response.message); // Thông báo kết quả
+                        location.reload(); // Tải lại trang sau khi xóa thành công
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error deleting records:", error);
+                        alert("Failed to delete records.");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.util.ArrayList;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import com.google.gson.Gson;
+
+@WebServlet("/DeleteRecordsServlet")
+public class DeleteRecordsServlet extends HttpServlet {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        // Đọc JSON request từ client
+        StringBuilder jsonBuffer = new StringBuilder();
+        BufferedReader reader = request.getReader();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            jsonBuffer.append(line);
+        }
+        String json = jsonBuffer.toString();
+
+        // Chuyển JSON thành danh sách ID
+        Gson gson = new Gson();
+        ArrayList<Integer> ids = gson.fromJson(json, ArrayList.class);
+
+        try {
+            // Kết nối đến database (thay đổi thông tin theo cấu hình của bạn)
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/your_database", "username", "password");
+
+            // Xóa các record theo danh sách ID
+            String placeholders = String.join(",", ids.stream().map(id -> "?").toArray(String[]::new));
+            String sql = "DELETE FROM your_table WHERE id IN (" + placeholders + ")";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+
+            // Gán giá trị vào các placeholder
+            for (int i = 0; i < ids.size(); i++) {
+                stmt.setInt(i + 1, ids.get(i));
+            }
+
+            // Thực thi query
+            int rowsDeleted = stmt.executeUpdate();
+            stmt.close();
+            conn.close();
+
+            // Trả về phản hồi cho client
+            PrintWriter out = response.getWriter();
+            out.write("{\"message\": \"Deleted " + rowsDeleted + " records successfully.\"}");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"message\": \"Failed to delete records.\"}");
+        }
+    }
+}
