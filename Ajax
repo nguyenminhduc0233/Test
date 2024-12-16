@@ -71,61 +71,35 @@ public class PaginationServlet extends HttpServlet {
 
 
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pagination with AJAX</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body>
-    <div id="data-container">
-        <!-- Dữ liệu sẽ được hiển thị ở đây -->
-    </div>
-    <div id="pagination">
-        <!-- Các nút phân trang sẽ xuất hiện ở đây -->
-    </div>
+<div id="pagination">
+    <div id="data-container"></div>
+    <button id="load-more">Load More</button>
+</div>
 
-    <script>
-        $(document).ready(function () {
-            // Hàm tải dữ liệu
-            function loadPage(page) {
-                $.ajax({
-                    url: "PaginationServlet", // Đường dẫn đến servlet
-                    method: "GET",
-                    data: { page: page }, // Gửi số trang qua GET
-                    dataType: "json",
-                    success: function (response) {
-                        // Hiển thị dữ liệu
-                        let html = '';
-                        response.data.forEach(function (item) {
-                            html += `<p>ID: ${item.id} - Name: ${item.name}</p>`;
-                        });
-                        $('#data-container').html(html);
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    let currentPage = 1;
+    const pageSize = 10;
 
-                        // Hiển thị phân trang
-                        let paginationHtml = '';
-                        for (let i = 1; i <= response.total_pages; i++) {
-                            paginationHtml += `<button class="page-btn" data-page="${i}">${i}</button>`;
-                        }
-                        $('#pagination').html(paginationHtml);
-                    },
-                    error: function () {
-                        alert('Lỗi khi tải dữ liệu.');
-                    }
+    $('#load-more').on('click', function () {
+        $.ajax({
+            url: `/api/data`,
+            method: 'GET',
+            data: { page: currentPage, size: pageSize },
+            success: function (response) {
+                const container = $('#data-container');
+                response.items.forEach(item => {
+                    container.append(`<div>${item.name}</div>`);
                 });
+
+                currentPage++;
+                if (response.isLastPage) {
+                    $('#load-more').hide();
+                }
+            },
+            error: function (error) {
+                console.error('Error:', error);
             }
-
-            // Gọi hàm loadPage lần đầu tiên
-            loadPage(1);
-
-            // Lắng nghe sự kiện click vào nút phân trang
-            $(document).on('click', '.page-btn', function () {
-                let page = $(this).data('page');
-                loadPage(page);
-            });
         });
-    </script>
-</body>
-</html>
+    });
+</script>
