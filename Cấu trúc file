@@ -1,0 +1,72 @@
+YourProject/
+├── src/
+│   ├── com/
+│   │   ├── example/
+│   │   │   ├── action/         <-- Các Action của Struts 1
+│   │   │   │   ├── UserAction.java
+│   │   │   │
+│   │   │   ├── form/           <-- Các FormBean của Struts 1
+│   │   │   │   ├── UserForm.java
+│   │   │   │
+│   │   │   ├── model/          <-- Các Entity của Hibernate
+│   │   │   │   ├── User.java
+│   │   │   │
+│   │   │   ├── service/        <-- Các Service của Spring
+│   │   │   │   ├── UserService.java
+│   │   │   │   ├── UserServiceImpl.java
+│   │   │   │
+│   │   │   ├── dao/            <-- Các DAO của Hibernate
+│   │   │   │   ├── UserDAO.java
+│   │   │   │   ├── UserDAOImpl.java
+│   │   │   │
+│   │   │   ├── config/         <-- Các cấu hình Spring và Hibernate
+│   │   │   │   ├── AppConfig.java
+│   │   │   │
+│   │   │   ├── util/           <-- Tiện ích chung (nếu có)
+│   │   │   │   ├── HibernateUtil.java
+│
+├── resources/                  <-- File cấu hình Hibernate
+│   ├── hibernate.cfg.xml
+│
+├── WebContent/                 <-- Thư mục cho Web Application
+│   ├── WEB-INF/
+│   │   ├── web.xml            <-- Cấu hình Servlet
+│   │   ├── struts-config.xml  <-- Cấu hình Struts
+│   │   ├── spring-config.xml  <-- Cấu hình Spring
+│   │   ├── tiles-defs.xml     <-- Cấu hình Tiles (nếu sử dụng)
+│   │   ├── lib/               <-- Thư viện (JAR files)
+│   │   │   ├── struts-core.jar
+│   │   │   ├── spring-context.jar
+│   │   │   ├── hibernate-core.jar
+│   │   │   ├── mysql-connector-java.jar
+│   │   │   ├── ...
+│   │
+│   ├── jsp/                   <-- JSP Pages
+│   │   ├── index.jsp
+│   │   ├── success.jsp
+│   │   ├── error.jsp
+│   │
+│   ├── css/                   <-- File CSS
+│   │   ├── styles.css
+│   │
+│   ├── js/                    <-- File JavaScript
+│   │   ├── script.js
+│
+├── build/                     <-- File biên dịch (compiled classes)
+│   ├── com/
+│   │   ├── example/
+│   │   │   ├── action/
+│   │   │   ├── service/
+│   │   │   ├── dao/
+│   │   │   ├── model/
+│   │   │   ├── config/
+│
+├── lib/                       <-- Thư viện JAR (nếu không đặt trong WEB-INF/lib)
+│   ├── struts-core.jar
+│   ├── spring-context.jar
+│   ├── hibernate-core.jar
+│   ├── mysql-connector-java.jar
+│
+├── .classpath                 <-- File cấu hình classpath (Eclipse IDE)
+├── .project                   <-- File cấu hình project (Eclipse IDE)
+└── README.md                  <-- Hướng dẫn sử dụng dự án
