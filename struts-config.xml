@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<struts-config>
+    <!-- Form Beans -->
+    <form-beans>
+        <form-bean name="userForm" type="com.example.form.UserForm"/>
+    </form-beans>
+
+    <!-- Action Mappings -->
+    <action-mappings>
+        <action path="/user"
+                type="com.example.action.UserAction"
+                name="userForm"
+                scope="request"
+                validate="false"
+                input="/error.jsp">
+            <forward name="success" path="/success.jsp"/>
+            <forward name="failure" path="/error.jsp"/>
+        </action>
+    </action-mappings>
+</struts-config>
+
+//    Giải thích:
+//    form-beans: Định nghĩa các FormBean (như UserForm) để chứa dữ liệu từ người dùng.
+//    action-mappings: Cấu hình các hành động Struts, liên kết URL với một Action class (ví dụ: UserAction) và FormBean (userForm).
+//    forward: Chỉ định trang JSP hiển thị sau khi xử lý xong action.
