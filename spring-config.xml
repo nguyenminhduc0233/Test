@@ -1,0 +1,36 @@
+//    File này cấu hình các Bean của Spring và kết nối với Hibernate để quản lý Transaction và Session.
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx.xsd">
+    
+    <!-- Hibernate SessionFactory -->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <property name="configLocation" value="classpath:hibernate.cfg.xml"/>
+    </bean>
+
+    <!-- Hibernate Transaction Manager -->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <!-- Enable Transaction Management -->
+    <tx:annotation-driven/>
+
+    <!-- UserService Bean -->
+    <bean id="userService" class="com.example.service.UserServiceImpl">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+</beans>
+
+//    Giải thích:
+//    sessionFactory: Cấu hình Spring để tạo ra Hibernate SessionFactory từ file cấu hình Hibernate.
+//    transactionManager: Quản lý các giao dịch Hibernate.
+//    tx:annotation-driven: Kích hoạt quản lý giao dịch tự động (transaction management) của Spring.
+//    userService: Định nghĩa một Spring Bean cho Service (UserService) để truy xuất dữ liệu từ cơ sở dữ liệu.
