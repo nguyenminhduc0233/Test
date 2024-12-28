@@ -1,32 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
+
+    <!-- Cấu hình kết nối database -->
     <session-factory>
-        <!-- Database connection settings -->
-        <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
-        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/test</property>
-        <property name="hibernate.connection.username">root</property>
-        <property name="hibernate.connection.password">password</property>
+        <!-- Driver class cho SQL Server -->
+        <property name="hibernate.connection.driver_class">com.microsoft.sqlserver.jdbc.SQLServerDriver</property>
+        <!-- URL kết nối -->
+        <property name="hibernate.connection.url">jdbc:sqlserver://localhost:1433;databaseName=your_database</property>
+        <!-- Username và password -->
+        <property name="hibernate.connection.username">your_username</property>
+        <property name="hibernate.connection.password">your_password</property>
 
-        <!-- JDBC connection pool settings -->
-        <property name="hibernate.c3p0.min_size">5</property>
-        <property name="hibernate.c3p0.max_size">20</property>
+        <!-- Dòng các Hibernate property -->
+        <property name="hibernate.dialect">org.hibernate.dialect.SQLServerDialect</property>
+        <property name="hibernate.hbm2ddl.auto">update</property> <!-- update, validate, create, create-drop -->
+        <property name="hibernate.show_sql">true</property> <!-- Hiển thị các câu truy vấn SQL -->
+        <property name="hibernate.format_sql">true</property>
 
-        <!-- Specify dialect -->
-        <property name="hibernate.dialect">org.hibernate.dialect.MySQL8Dialect</property>
-
-        <!-- Enable Hibernate's automatic session context management -->
-        <property name="hibernate.current_session_context_class">thread</property>
-
-        <!-- Echo all executed SQL to stdout -->
-        <property name="hibernate.show_sql">true</property>
-
-        <!-- Drop and re-create the database schema on startup -->
-        <property name="hibernate.hbm2ddl.auto">update</property>
-
-        <!-- Mention annotated class -->
-        <mapping class="com.example.model.User"/>
+        <!-- Cấu hình cache (tuỳ chọn) -->
+        <property name="hibernate.cache.use_second_level_cache">true</property>
+        <property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</property>
     </session-factory>
+
 </hibernate-configuration>
+
 
 //    Giải thích:
 //    hibernate.connection.driver_class: Chỉ định driver JDBC cho MySQL.
