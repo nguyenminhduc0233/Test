@@ -61,12 +61,6 @@ YourProject/
 │   │   │   ├── model/
 │   │   │   ├── config/
 │
-├── lib/                       <-- Thư viện JAR (nếu không đặt trong WEB-INF/lib)
-│   ├── struts-core.jar
-│   ├── spring-context.jar
-│   ├── hibernate-core.jar
-│   ├── mysql-connector-java.jar
-│
 ├── .classpath                 <-- File cấu hình classpath (Eclipse IDE)
 ├── .project                   <-- File cấu hình project (Eclipse IDE)
 └── README.md                  <-- Hướng dẫn sử dụng dự án
