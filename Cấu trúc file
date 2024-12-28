@@ -33,7 +33,6 @@ YourProject/
 │   │   ├── web.xml            <-- Cấu hình Servlet
 │   │   ├── struts-config.xml  <-- Cấu hình Struts
 │   │   ├── spring-config.xml  <-- Cấu hình Spring
-│   │   ├── tiles-defs.xml     <-- Cấu hình Tiles (nếu sử dụng)
 │   │   ├── lib/               <-- Thư viện (JAR files)
 │   │   │   ├── struts-core.jar
 │   │   │   ├── spring-context.jar
